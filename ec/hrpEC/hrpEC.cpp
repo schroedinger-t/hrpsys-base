@@ -75,7 +75,12 @@ namespace RTC
         pid_t pid = getpid();
         std::cerr << ";; enterRT " << pid << " " << tid << std::endl;
 #ifndef __APPLE__
-        if (sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
+        {
+          int ret = sched_getscheduler();
+          int retp = sched_getscheduler(pid);
+          std::cerr << "SCHED_FIFO = " << SCHED_FIFO << " / " << ret " , " << retp  << std::endl;
+        }
+        if (sched_setscheduler(pid, SCHED_FIFO, &param) == -1) {
             perror("sched_setscheduler");
             std::cerr << "If you are running this program on normal linux kernel for debug purpose, you can ignore the error message displayed above. If not, this program must have superuser privilege." << std::endl;
             //return -1;
