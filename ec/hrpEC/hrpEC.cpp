@@ -53,9 +53,6 @@ namespace RTC
 
     bool hrpExecutionContext::waitForNextPeriod()
     {
-      //pid_t tid = syscall(SYS_gettid);
-      //pid_t pid = getpid();
-      //std::cerr << ";; wait    " << pid << " " << tid << std::endl;
         int nsubstep = number_of_substeps();
         while(1){
             if (wait_for_iob_signal()){
@@ -71,18 +68,14 @@ namespace RTC
     {
         struct sched_param param;
         param.sched_priority = m_priority;
-        pid_t tid = syscall(SYS_gettid);
-        pid_t pid = getpid();
-        std::cerr << ";; enterRT " << pid << " " << tid << std::endl;
 #ifndef __APPLE__
-        {
-          int ret = sched_getscheduler(0);
-          int retp = sched_getscheduler(pid);
-          std::cerr << "SCHED_FIFO1 = " << SCHED_FIFO << " / ";
-          std::cerr << ret << " , ";
-          std::cerr << retp  << std::endl;
+        pid_t pid = getpid();
+        int pprio = sched_getscheduler(pid);
+        if (pprio == SCHED_FIFO) {
+          // this process has already been in realtime process
+          return true;
         }
-        if (sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
+        if (sched_setscheduler(pid, SCHED_FIFO, &param) == -1) {
             perror("sched_setscheduler");
             std::cerr << "If you are running this program on normal linux kernel for debug purpose, you can ignore the error message displayed above. If not, this program must have superuser privilege." << std::endl;
             //return -1;
