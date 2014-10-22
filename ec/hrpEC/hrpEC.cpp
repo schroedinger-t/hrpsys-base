@@ -53,9 +53,9 @@ namespace RTC
 
     bool hrpExecutionContext::waitForNextPeriod()
     {
-        pid_t tid = syscall(SYS_gettid);
-        pid_t pid = getpid();
-        std::cerr << ";; wait    " << pid << " " << tid << std::endl;
+      //pid_t tid = syscall(SYS_gettid);
+      //pid_t pid = getpid();
+      //std::cerr << ";; wait    " << pid << " " << tid << std::endl;
         int nsubstep = number_of_substeps();
         while(1){
             if (wait_for_iob_signal()){
