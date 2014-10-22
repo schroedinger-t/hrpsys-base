@@ -12,6 +12,7 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/mman.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #define MAX_SAFE_STACK (8*1024) /* The maximum stack size which is
@@ -64,7 +65,13 @@ namespace RTC
         param.sched_priority = m_priority;
 
 #ifndef __APPLE__
-        if (sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
+        pid_t pid = getpid();
+        int pprio = sched_getscheduler(pid);
+        if (pprio == SCHED_FIFO) {
+          // this process has already been in realtime process
+          return true;
+        }
+        if (sched_setscheduler(pid, SCHED_FIFO, &param) == -1) {
             perror("sched_setscheduler");
             std::cerr << "If you are running this program on normal linux kernel for debug purpose, you can ignore the error message displayed above. If not, this program must have superuser privilege." << std::endl;
             //return -1;
