@@ -14,6 +14,12 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#include <sys/syscall.h>
+#include <sys/types.h>
+
+
+
+
 #define MAX_SAFE_STACK (8*1024) /* The maximum stack size which is
                                    guranteed safe to access without
                                    faulting */
@@ -47,6 +53,9 @@ namespace RTC
 
     bool hrpExecutionContext::waitForNextPeriod()
     {
+        pid_t tid = syscall(SYS_gettid);
+        pid_t pid = getpid();
+        std::cerr << ";; wait    " << pid << " " << tid << std::endl;
         int nsubstep = number_of_substeps();
         while(1){
             if (wait_for_iob_signal()){
@@ -62,7 +71,9 @@ namespace RTC
     {
         struct sched_param param;
         param.sched_priority = m_priority;
-
+        pid_t tid = syscall(SYS_gettid);
+        pid_t pid = getpid();
+        std::cerr << ";; enterRT " << pid << " " << tid << std::endl;
 #ifndef __APPLE__
         if (sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
             perror("sched_setscheduler");
