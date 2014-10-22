@@ -78,7 +78,9 @@ namespace RTC
         {
           int ret = sched_getscheduler(0);
           int retp = sched_getscheduler(pid);
-          std::cerr << "SCHED_FIFO = " << SCHED_FIFO << " / " << ret " , " << retp  << std::endl;
+          std::cerr << "SCHED_FIFO = " << SCHED_FIFO << " / ";
+          std::cerr << ret << " , ";
+          std::cerr << retp  << std::endl;
         }
         if (sched_setscheduler(pid, SCHED_FIFO, &param) == -1) {
             perror("sched_setscheduler");
