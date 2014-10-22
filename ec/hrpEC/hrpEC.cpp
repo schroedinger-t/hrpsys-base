@@ -82,7 +82,7 @@ namespace RTC
           std::cerr << ret << " , ";
           std::cerr << retp  << std::endl;
         }
-        if (sched_setscheduler(pid, SCHED_FIFO, &param) == -1) {
+        if (sched_setscheduler(0, SCHED_FIFO, &param) == -1) {
             perror("sched_setscheduler");
             std::cerr << "If you are running this program on normal linux kernel for debug purpose, you can ignore the error message displayed above. If not, this program must have superuser privilege." << std::endl;
             //return -1;
