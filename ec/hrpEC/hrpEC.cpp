@@ -76,7 +76,7 @@ namespace RTC
         std::cerr << ";; enterRT " << pid << " " << tid << std::endl;
 #ifndef __APPLE__
         {
-          int ret = sched_getscheduler();
+          int ret = sched_getscheduler(0);
           int retp = sched_getscheduler(pid);
           std::cerr << "SCHED_FIFO = " << SCHED_FIFO << " / " << ret " , " << retp  << std::endl;
         }
