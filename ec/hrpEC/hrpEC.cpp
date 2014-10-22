@@ -12,13 +12,8 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/mman.h>
-#include <unistd.h>
-
-#include <sys/syscall.h>
 #include <sys/types.h>
-
-
-
+#include <unistd.h>
 
 #define MAX_SAFE_STACK (8*1024) /* The maximum stack size which is
                                    guranteed safe to access without
