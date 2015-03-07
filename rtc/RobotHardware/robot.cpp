@@ -550,6 +550,15 @@ bool robot::checkEmergency(emg_reason &o_reason, int &o_id)
             return true;
         }
     } 
+    int alarm;
+    for (int i=0; i<numJoints(); i++){
+        read_servo_alarm(i, &alarm);
+        if (alarm & SS_EMERGENCY) {
+            o_reason = EMG_SERVO_ALARM;
+            o_id = i;
+            return true;
+        }
+    }
     return false;
 }
 

@@ -211,7 +211,7 @@ public:
     /**
        \brief reasons of emergency
      */
-    typedef enum {EMG_SERVO_ERROR, EMG_FZ} emg_reason;
+    typedef enum {EMG_SERVO_ERROR, EMG_FZ, EMG_SERVO_ALARM} emg_reason;
 
     /**
        \brief check occurrence of emergency state
