@@ -289,7 +289,7 @@ private:
     bool m_calibRequested;
     std::string m_calibJointName, m_calibOptions;
     std::string m_pdgainsFilename;
-
+    bool m_reportedEmergency;
     boost::interprocess::interprocess_semaphore wait_sem;
 };
 
