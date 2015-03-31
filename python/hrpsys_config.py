@@ -4,12 +4,7 @@ import os
 import rtm
 
 from rtm import *
-import imp
-try:
-    imp.load_module('OpenHRP3')  # for old OpenHRP3 (< 3.1.7)
-    from OpenHRP3 import *
-except:
-    from OpenHRP import *
+from OpenHRP import *
 from hrpsys import *  # load ModelLoader
 
 import socket
@@ -177,6 +172,11 @@ class HrpsysConfigurator:
     sh_svc = None
     sh_version = None
 
+    # ServoController
+    sc= None
+    sc_svc = None
+    sc_version = None
+
     # ForwardKinematics
     fk = None
     fk_svc = None
@@ -272,6 +272,11 @@ class HrpsysConfigurator:
                 else:
                     connectPorts(tmp_contollers[-1].port("q"), self.hgc.port("qIn"))
                     connectPorts(self.hgc.port("qOut"), self.rh.port("qRef"))
+                    if rtm.findPort(self.rh.ref, "basePoseRef"):
+                        if self.abc:
+                            connectPorts(self.abc.port("basePoseOut"), self.rh.port("basePoseRef"))
+                        else:
+                            connectPorts(self.sh.port("basePoseOut"), self.rh.port("basePoseRef"))
             else:
                 connectPorts(tmp_contollers[-1].port("q"), self.rh.port("qRef"))
         else:
@@ -281,6 +286,11 @@ class HrpsysConfigurator:
                 else:
                     connectPorts(self.sh.port("qOut"), self.hgc.port("qIn"))
                     connectPorts(self.hgc.port("qOut"), self.rh.port("qRef"))
+                    if rtm.findPort(self.rh.ref, "basePoseRef"):
+                        if self.abc:
+                            connectPorts(self.abc.port("basePoseOut"), self.rh.port("basePoseRef"))
+                        else:
+                            connectPorts(self.sh.port("basePoseOut"), self.rh.port("basePoseRef"))
             else:
                 connectPorts(self.sh.port("qOut"), self.rh.port("qRef"))
 
@@ -317,13 +327,15 @@ class HrpsysConfigurator:
         connectPorts(self.seq.port("basePos"), self.sh.port("basePosIn"))
         connectPorts(self.seq.port("baseRpy"), self.sh.port("baseRpyIn"))
         connectPorts(self.seq.port("zmpRef"), self.sh.port("zmpIn"))
-        connectPorts(self.seq.port("optionalData"), self.sh.port("optionalDataIn"))
+        if self.seq_version >= '315.2.6':
+            connectPorts(self.seq.port("optionalData"), self.sh.port("optionalDataIn"))
         connectPorts(self.sh.port("basePosOut"), [self.seq.port("basePosInit"),
                                                   self.fk.port("basePosRef")])
         connectPorts(self.sh.port("baseRpyOut"), [self.seq.port("baseRpyInit"),
                                                   self.fk.port("baseRpyRef")])
         connectPorts(self.sh.port("qOut"), self.seq.port("qInit"))
-        connectPorts(self.sh.port("zmpOut"), self.seq.port("zmpRefInit"))
+        if self.seq_version >= '315.2.0':
+            connectPorts(self.sh.port("zmpOut"), self.seq.port("zmpRefInit"))
         for sen in self.getForceSensorNames():
             connectPorts(self.seq.port(sen + "Ref"),
                          self.sh.port(sen + "In"))
@@ -357,6 +369,9 @@ class HrpsysConfigurator:
             if self.abc:
                 connectPorts(self.sh.port(sen+"Out"),
                              self.abc.port("ref_" + sen))
+            if self.abc and self.st:
+                connectPorts(self.abc.port("limbCOPOffset_"+sen),
+                             self.st.port("limbCOPOffset_"+sen))
 
         #  actual force sensors
         if self.rmfo:
@@ -377,8 +392,9 @@ class HrpsysConfigurator:
         # connection for ic
         if self.ic:
             connectPorts(self.rh.port("q"), self.ic.port("qCurrent"))
-            connectPorts(self.sh.port("basePosOut"), self.ic.port("basePosIn"))
-            connectPorts(self.sh.port("baseRpyOut"), self.ic.port("baseRpyIn"))
+            if self.seq_version >= '315.3.0':
+                connectPorts(self.sh.port("basePosOut"), self.ic.port("basePosIn"))
+                connectPorts(self.sh.port("baseRpyOut"), self.ic.port("baseRpyIn"))
         # connection for tf
         if self.tf:
             # connection for actual torques
@@ -450,6 +466,14 @@ class HrpsysConfigurator:
         for r in rtcList:
             r.start()
 
+    def deactivateComps(self):
+        '''!@brief
+        Deactivate components(plugins)
+        '''
+        rtcList = self.getRTCInstanceList()
+        for r in reversed(rtcList):
+            r.stop()
+
     def createComp(self, compName, instanceName):
         '''!@brief
         Create RTC component (plugins)
@@ -485,6 +509,33 @@ class HrpsysConfigurator:
                 print self.configurator_name, '\033[31mFail to createComps',e,'\033[0m'
 
 
+    def deleteComp(self, compName):
+        '''!@brief
+        Delete RTC component (plugins)
+
+        @param compName str: name of component that to be deleted
+        '''
+        # component must be stoppped before delete
+        comp = rtm.findRTC(compName)
+        comp.stop()
+        return self.ms.delete(compName)
+
+    def deleteComps(self):
+        '''!@brief
+        Delete components(plugins) in getRTCInstanceList()
+        '''
+        self.deactivateComps()
+        rtcList = self.getRTCInstanceList()
+        if rtcList:
+            try:
+                rtcList.remove(self.rh)
+                for r in reversed(rtcList):
+                    if r.isActive():
+                        print self.configurator_name, '\033[31m ' + r.name() + ' is staill active\033[0m'
+                    self.deleteComp(r.name())
+            except Exception, e:
+                print self.configurator_name, '\033[31mFail to deleteComps',e,'\033[0m'
+
     def findComp(self, compName, instanceName, max_timeout_count=10):
         '''!@brief
         Find component(plugin) 
@@ -495,6 +546,7 @@ class HrpsysConfigurator:
         '''
         timeout_count = 0
         comp = rtm.findRTC(instanceName)
+        version = None
         while comp == None and timeout_count < max_timeout_count:
             comp = rtm.findRTC(instanceName)
             if comp != None:
@@ -502,17 +554,19 @@ class HrpsysConfigurator:
             print self.configurator_name, " find Comp wait for", instanceName
             time.sleep(1)
             timeout_count += 1
-        print self.configurator_name, " find Comp    : ", instanceName, " = ", comp
+        if comp and comp.ref:
+            version = comp.ref.get_component_profile().version
+        print self.configurator_name, " find Comp    : ", instanceName, " = ", comp, " (", version, ")"
         if comp == None:
             print self.configurator_name, " Cannot find component: " + instanceName + " (" + compName + ")"
-            return [None, None]
+            return [None, None, None]
         comp_svc_port = comp.service("service0")
         if comp_svc_port:
             comp_svc = narrow(comp_svc_port, compName + "Service")
             print self.configurator_name, " find CompSvc : ", instanceName + "_svc = ", comp_svc
-            return [comp, comp_svc]
+            return [comp, comp_svc, version]
         else:
-            return [comp, None]
+            return [comp, None, version]
 
     def findComps(self):
         '''!@brief
@@ -522,7 +576,7 @@ class HrpsysConfigurator:
         for rn in self.getRTCList():
             rn2 = 'self.' + rn[0]
             if eval(rn2) == None:
-                create_str = "[self." + rn[0] + ", self." + rn[0] + "_svc] = self.findComp(\"" + rn[1] + "\",\"" + rn[0] + "\"," + str(max_timeout_count) + ")"
+                create_str = "[self." + rn[0] + ", self." + rn[0] + "_svc, self." + rn[0] + "_version] = self.findComp(\"" + rn[1] + "\",\"" + rn[0] + "\"," + str(max_timeout_count) + ")"
                 print self.configurator_name, create_str
                 exec(create_str)
                 if eval(rn2) == None:
@@ -594,9 +648,13 @@ class HrpsysConfigurator:
         Get list of RTC Instance
         '''
         ret = [self.rh]
-        for r in map(lambda x: 'self.' + x[0], self.getRTCList()):
+        for rtc in self.getRTCList():
+            r = 'self.'+rtc[0]
             try:
-                ret.append(eval(r))
+                if eval(r): 
+                    ret.append(eval(r))
+                else:
+                    print self.configurator_name, '\033[31mFail to find instance ('+str(rtc)+') for getRTCInstanceList\033[0m'
             except Exception, e:
                 print self.configurator_name, '\033[31mFail to getRTCInstanceList',e,'\033[0m'
         return ret

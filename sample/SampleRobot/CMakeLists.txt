@@ -19,6 +19,7 @@ set(CONTROLLER_TIME 0.002)
 set(CONTROLLER_PERIOD 500)
 set(VirtualForceSensorSetting "virtual_force_sensor")
 configure_file(SampleRobot.conf.in ${CMAKE_CURRENT_BINARY_DIR}/SampleRobot.500.vfs.conf)
+set(VirtualForceSensorSetting "#virtual_force_sensor") # comment out
 set(JointLimitTableSetting "joint_limit_table")
 configure_file(SampleRobot.conf.in ${CMAKE_CURRENT_BINARY_DIR}/SampleRobot.500.el.conf)
 
@@ -81,4 +82,6 @@ install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/SampleRobot.TerrainFloor.StairUp.xml
   ${CMAKE_CURRENT_BINARY_DIR}/SampleRobot.TerrainFloor.StairDown.xml
   DESTINATION share/hrpsys/samples/SampleRobot)
+
+add_subdirectory(rtc)
 
