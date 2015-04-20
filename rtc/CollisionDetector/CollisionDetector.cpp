@@ -170,7 +170,7 @@ RTC::ReturnCode_t CollisionDetector::onInitialize()
     setupVClipModel(m_robot);
 
     double collision_tolerance = 0.0;
-    if ( prop["collision_tolerance"] != ) {
+    if ( prop["collision_tolerance"] != "") {
         coil::stringTo(collision_tolerance, prop["collision_tolerance"].c_str());
     }
     if ( prop["collision_pair"] != "" ) {
@@ -192,7 +192,8 @@ RTC::ReturnCode_t CollisionDetector::onInitialize()
             }
             pos = name2.find_first_of(':');
             if (pos != string::npos) {
-                std::istringstream numiss (name2.substr(0, pos+1));
+                std::istringstream numiss (name2.substr(pos+1));
+                std::cerr << "tol: " << name2.substr(pos+1) << std::endl;
                 name2.erase(pos);
                 numiss >> tolerance;
             }
@@ -205,6 +206,7 @@ RTC::ReturnCode_t CollisionDetector::onInitialize()
 		std::cerr << std::endl;
                 continue;
             }
+            tmp = name1 + ":" + name2;
 	    std::cerr << "check collisions between " << m_robot->link(name1)->name << " and " <<  m_robot->link(name2)->name << " with padding " << tolerance << std::endl;
 	    m_pair[tmp] = new CollisionLinkPair(new VclipLinkPair(m_robot->link(name1), m_VclipLinks[m_robot->link(name1)->index],
                                                                   m_robot->link(name2), m_VclipLinks[m_robot->link(name2)->index], tolerance));
