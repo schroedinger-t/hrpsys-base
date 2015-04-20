@@ -169,11 +169,16 @@ RTC::ReturnCode_t CollisionDetector::onInitialize()
     }
     setupVClipModel(m_robot);
 
+    double collision_tolerance = 0.0;
+    if ( prop["collision_tolerance"] != ) {
+        coil::stringTo(collision_tolerance, prop["collision_tolerance"].c_str());
+    }
     if ( prop["collision_pair"] != "" ) {
 	std::cerr << "prop[collision_pair] ->" << prop["collision_pair"] << std::endl;
 	std::istringstream iss(prop["collision_pair"]);
 	std::string tmp;
 	while (getline(iss, tmp, ' ')) {
+            double tolerance = collision_tolerance;
 	    size_t pos = tmp.find_first_of(':');
 	    std::string name1 = tmp.substr(0, pos), name2 = tmp.substr(pos+1);
             if ( m_robot->link(name1)==NULL ) {
@@ -185,6 +190,12 @@ RTC::ReturnCode_t CollisionDetector::onInitialize()
 		std::cerr << std::endl;
                 continue;
             }
+            pos = name2.find_first_of(':');
+            if (pos != string::npos) {
+                std::istringstream numiss (name2.substr(0, pos+1));
+                name2.erase(pos);
+                numiss >> tolerance;
+            }
             if ( m_robot->link(name2)==NULL ) {
                 std::cerr << "Could not find robot link " << name2 << std::endl;
 		std::cerr << " please choose one of following :";
@@ -194,9 +205,9 @@ RTC::ReturnCode_t CollisionDetector::onInitialize()
 		std::cerr << std::endl;
                 continue;
             }
-	    std::cerr << "check collisions between " << m_robot->link(name1)->name << " and " <<  m_robot->link(name2)->name << std::endl;
+	    std::cerr << "check collisions between " << m_robot->link(name1)->name << " and " <<  m_robot->link(name2)->name << " with padding " << tolerance << std::endl;
 	    m_pair[tmp] = new CollisionLinkPair(new VclipLinkPair(m_robot->link(name1), m_VclipLinks[m_robot->link(name1)->index],
-                                                                  m_robot->link(name2), m_VclipLinks[m_robot->link(name2)->index], 0));
+                                                                  m_robot->link(name2), m_VclipLinks[m_robot->link(name2)->index], tolerance));
 	}
     }
 
