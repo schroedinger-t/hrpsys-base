@@ -8,7 +8,7 @@
 #include "defs.h"
 #include "hrpsys/io/iob.h"
 #include "robot.h"
-#include "util/Hrpsys.h"
+#include "hrpsys/util/Hrpsys.h"
 
 #define CALIB_COUNT	(10*200)
 #define GAIN_COUNT	( 5*200)

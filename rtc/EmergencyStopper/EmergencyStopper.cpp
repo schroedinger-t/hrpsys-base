@@ -7,7 +7,7 @@
  * $Id$
  */
 
-#include "util/VectorConvert.h"
+#include "hrpsys/util/VectorConvert.h"
 #include <rtm/CorbaNaming.h>
 #include <hrpModel/ModelLoaderUtil.h>
 #include <math.h>

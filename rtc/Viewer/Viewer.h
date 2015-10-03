@@ -16,8 +16,8 @@
 #include <rtm/DataInPort.h>
 #include <rtm/DataOutPort.h>
 #include <rtm/idl/BasicDataTypeSkel.h>
-#include "util/LogManager.h"
-#include "util/SDLUtil.h"
+#include "hrpsys/util/LogManager.h"
+#include "hrpsys/util/SDLUtil.h"
 #include "hrpsys/idl/HRPDataTypes.hh"
 #include "GLscene.h"
 

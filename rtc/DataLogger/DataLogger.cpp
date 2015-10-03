@@ -8,7 +8,7 @@
  */
 
 #include "DataLogger.h"
-#include "util/Hrpsys.h"
+#include "hrpsys/util/Hrpsys.h"
 #include "hrpsys/idl/pointcloud.hh"
 
 
