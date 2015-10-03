@@ -16,7 +16,7 @@
 #include "util/BVutil.h"
 #include "TimedPosture.h"
 #include "GLscene.h"
-#include "CollisionDetectorService.hh"
+#include "hrpsys/idl/CollisionDetectorService.hh"
 
 using namespace hrp;
 using namespace OpenHRP;

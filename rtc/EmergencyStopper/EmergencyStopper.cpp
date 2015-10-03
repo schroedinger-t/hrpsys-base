@@ -13,7 +13,7 @@
 #include <math.h>
 #include <hrpModel/Link.h>
 #include <hrpModel/Sensor.h>
-#include "RobotHardwareService.hh"
+#include "hrpsys/idl/RobotHardwareService.hh"
 
 #include "EmergencyStopper.h"
 #include "../SoftErrorLimiter/beep.h"

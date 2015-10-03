@@ -19,7 +19,7 @@
 #include "util/GLutil.h"
 #endif // USE_HRPSYSUTIL
 #include "util/BVutil.h"
-#include "RobotHardwareService.hh"
+#include "hrpsys/idl/RobotHardwareService.hh"
 
 #include "CollisionDetector.h"
 #include "../SoftErrorLimiter/beep.h"

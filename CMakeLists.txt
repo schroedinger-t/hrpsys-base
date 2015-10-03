@@ -55,8 +55,12 @@ if (NOT EXISTS ${CMAKE_BINARY_DIR}/hrpsys/io)
     COMMAND ln -s ${CMAKE_BINARY_DIR}/lib/io ${CMAKE_BINARY_DIR}/hrpsys/io
    )
 endif()
+if (NOT EXISTS ${CMAKE_BINARY_DIR}/hrpsys/idl)
+  execute_process(
+    COMMAND ln -s ${CMAKE_BINARY_DIR}/idl ${CMAKE_BINARY_DIR}/hrpsys/idl
+   )
+endif()
 include_directories(${PROJECT_SOURCE_DIR}/lib)
-include_directories(${CMAKE_BINARY_DIR}/idl)
 
 if(ENABLE_INSTALL_RPATH)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib:$ORIGIN/../../../lib:${OPENHRP_LIBRARY_DIRS}")

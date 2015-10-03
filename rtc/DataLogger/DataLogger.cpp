@@ -9,7 +9,7 @@
 
 #include "DataLogger.h"
 #include "util/Hrpsys.h"
-#include "pointcloud.hh"
+#include "hrpsys/idl/pointcloud.hh"
 
 
 typedef coil::Guard<coil::Mutex> Guard;

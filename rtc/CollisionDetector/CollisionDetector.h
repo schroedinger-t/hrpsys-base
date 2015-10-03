@@ -26,7 +26,7 @@
 #endif // USE_HRPSYSUTIL
 #include "TimedPosture.h"
 #include "interpolator.h"
-#include "HRPDataTypes.hh"
+#include "hrpsys/idl/HRPDataTypes.hh"
 
 #include "VclipLinkPair.h"
 #include "CollisionDetectorService_impl.h"

@@ -11,7 +11,7 @@
 #include "util/GLlink.h"
 #include "util/GLbody.h"
 #include "util/LogManager.h"
-#include "HRPDataTypes.hh"
+#include "hrpsys/idl/HRPDataTypes.hh"
 #include "GLscene.h"
 
 using namespace OpenHRP;

@@ -18,7 +18,7 @@
 #include <rtm/idl/BasicDataTypeSkel.h>
 #include "util/LogManager.h"
 #include "util/SDLUtil.h"
-#include "HRPDataTypes.hh"
+#include "hrpsys/idl/HRPDataTypes.hh"
 #include "GLscene.h"
 
 class RTCGLbody;

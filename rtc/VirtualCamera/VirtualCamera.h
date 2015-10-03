@@ -23,9 +23,9 @@
 //
 #include "util/LogManager.h"
 #include "util/SDLUtil.h"
-#include "Img.hh"
-#include "HRPDataTypes.hh"
-#include "pointcloud.hh"
+#include "hrpsys/idl/Img.hh"
+#include "hrpsys/idl/HRPDataTypes.hh"
+#include "hrpsys/idl/pointcloud.hh"
 #include "GLscene.h"
 class GLcamera;
 class RTCGLbody;

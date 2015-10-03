@@ -11,7 +11,7 @@
 #include "util/VectorConvert.h"
 #include <rtm/CorbaNaming.h>
 #include <hrpModel/ModelLoaderUtil.h>
-#include "RobotHardwareService.hh"
+#include "hrpsys/idl/RobotHardwareService.hh"
 
 #include <math.h>
 #include <vector>
