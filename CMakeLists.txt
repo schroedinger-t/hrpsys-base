@@ -47,6 +47,14 @@ if(UNIX)
     add_definitions(${OPENHRP_DEFINITIONS})
 endif()
 
+execute_process(
+  COMMAND mkdir -p ${CMAKE_BINARY_DIR}/hrpsys
+)
+if (NOT EXISTS ${CMAKE_BINARY_DIR}/hrpsys/io)
+  execute_process(
+    COMMAND ln -s ${CMAKE_BINARY_DIR}/lib/io ${CMAKE_BINARY_DIR}/hrpsys/io
+   )
+endif()
 include_directories(${PROJECT_SOURCE_DIR}/lib)
 include_directories(${CMAKE_BINARY_DIR}/idl)
 
