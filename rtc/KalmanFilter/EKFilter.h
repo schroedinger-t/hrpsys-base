@@ -3,7 +3,7 @@
 
 #include <hrpUtil/EigenTypes.h>
 #include <iostream>
-#include "util/Hrpsys.h"
+#include "hrpsys/util/Hrpsys.h"
 
 class EKFilter {
 public:
